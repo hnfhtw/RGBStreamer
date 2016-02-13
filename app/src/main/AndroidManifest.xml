@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.hn.rgbstreamer" >
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+          // provide bluetooth permission
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    // provide bluetooth admin permission to initiate device discovery or manipulate Bluetooth settings
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/> // to save BMP
+
+    <application android:name=".Globals"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".RGBStreamer"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".DrawPicture"
+            android:label="@string/title_activity_draw_picture" >
+        </activity>
+    </application>
+</manifest>
