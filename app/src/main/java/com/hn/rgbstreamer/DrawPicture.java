@@ -25,8 +25,8 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.hn.rgbstreamer.TextinputDialogFragment.TextinputDialogListener;
 
 // RGBStreamer - DrawPicture activity
-// Version: V01
-// Last Mofidied: 04.02.2016
+// Version: V01_001
+// Last Mofidied: 17.02.2016
 // Author: HN            (ColorPicker: https://github.com/QuadFlask/colorpicker,
 //                        TextInputDialog: http://www.androidinterview.com/android-custom-dialog-box-example-android-dialog/
 //                        PickImageFromGallery: http://programmerguru.com/android-tutorial/how-to-pick-image-from-gallery/)
@@ -40,6 +40,8 @@ public class DrawPicture extends AppCompatActivity implements TextinputDialogLis
     private static TextView outputColor;
     private int initialColor;
     String imgDecodableString;
+    private int px_width;
+    private int px_height;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,10 @@ public class DrawPicture extends AppCompatActivity implements TextinputDialogLis
             outputColor.setText("HEX Color: "+hexColor);  // output of the picked color (for debugging)
 
             customCanvas.setColor(initialColor); // set the initial color in the canvas
+
+            // get width and height of the drawing area available on the panels (number of pixels)
+            px_width = appState.getNoPanelCol()*appState.getNoPixelCol();
+            px_height = appState.getNoPanelRows()*appState.getNoPixelRows();
         }
     }
 
@@ -112,7 +118,7 @@ public class DrawPicture extends AppCompatActivity implements TextinputDialogLis
 
                 BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                 Bitmap bitmapS = BitmapFactory.decodeFile(imgDecodableString,bmOptions);
-                bitmapS = Bitmap.createScaledBitmap(bitmapS,32,32,true);                            // HN: width x height 32 x 32 -> adapt to variable panel size!!
+                bitmapS = Bitmap.createScaledBitmap(bitmapS,px_width,px_height,true);
 
                 // Stream Bitmap
                 customCanvas.streamBitmap(bitmapS);

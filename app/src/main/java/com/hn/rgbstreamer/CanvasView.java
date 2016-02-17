@@ -20,8 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 // RGBStreamer - CanvasView - draws the panel and sends pixels utilizing the BluetoothSocket
-// Version: V01
-// Last Mofidied: 04.02.2016
+// Version: V01_001
+// Last Mofidied: 17.02.2016
 // Author: HN
 
 public class CanvasView extends View {
@@ -215,15 +215,27 @@ public class CanvasView extends View {
         appState.sendRGBStreamingPacket(253,253,0,0,0);
 
         int ack = 0;
+        int r,g,b;
 
         // streaming of bitmap
-        for(int x = 0; x < 32; x++)
+        for(int x = 0; x < 32; x++)     // loop through all pixels of bitmap
             for(int y = 0; y < 32; y++)
             {
+                r = Color.red(bitmapS.getPixel(x, y));          // get R value of pixel
+                g = Color.green(bitmapS.getPixel(x, y));        // get G value of pixel
+                b = Color.blue(bitmapS.getPixel(x, y));         // get B value of pixel
+
+                if(r == 100 && g == 100 && b == 100)            // don't stream color of grey grid
+                {
+                    r = 0;
+                    g = 0;
+                    b = 0;
+                }
+
                 if(appState.getAckEnabledStreaming())
                 {
                     do {
-                        appState.sendRGBStreamingPacket(x, y, Color.red(bitmapS.getPixel(x, y)), Color.green(bitmapS.getPixel(x, y)), Color.blue(bitmapS.getPixel(x, y)));
+                        appState.sendRGBStreamingPacket(x, y, r, g, b);
                         ack = 0;        // reset ack - otherwise it would remain at its old value if no byte can be read from the InputStream
                         try {
                             ack = RGBStreamer.mChannel.read();
@@ -236,7 +248,7 @@ public class CanvasView extends View {
                 }
                 else
                 {
-                    appState.sendRGBStreamingPacket(x, y, Color.red(bitmapS.getPixel(x, y)), Color.green(bitmapS.getPixel(x, y)), Color.blue(bitmapS.getPixel(x, y)));
+                    appState.sendRGBStreamingPacket(x, y, r, g, b);
                 }
 
                 // update color array to show picture on canvas
@@ -254,6 +266,9 @@ public class CanvasView extends View {
     // save the picture to a png file
     public void saveBitmap(String filename) {
 
+        Bitmap sBitmap = Bitmap.createBitmap(pixels_width, pixels_height, Bitmap.Config.ARGB_8888);     // create new Bitmap to save as file
+
+
         FileOutputStream out = null;
 
         String file_path = Environment.getExternalStorageDirectory().getAbsolutePath() +
@@ -264,10 +279,22 @@ public class CanvasView extends View {
         File file = new File(dir, filename+".png");
 
         try {
-            this.setDrawingCacheEnabled(true);  // HN
+            //this.setDrawingCacheEnabled(true);
             out = new FileOutputStream(file);
-            mBitmap = this.getDrawingCache();
-            mBitmap.compress(Bitmap.CompressFormat.PNG, 85, out); // compress bitmap to PNG format and write to the specified file
+           // mBitmap = this.getDrawingCache();     // Previously used to store bitmap with size of the canvas
+
+            for(int x = 0; x < 32; x++)
+                for(int y = 0; y < 32; y++)
+                {
+                    //if(colorArray[x][y] !=0xFF646464)   // could be used to filter out the color of grey grid
+                        sBitmap.setPixel(x,y,colorArray[x][y]);
+                   // else
+                     //   sBitmap.setPixel(x,y,0xFF000000);   // could be used to replace grey grid color by black
+                }
+
+
+
+            sBitmap.compress(Bitmap.CompressFormat.PNG, 85, out); // compress bitmap to PNG format and write to the specified file
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

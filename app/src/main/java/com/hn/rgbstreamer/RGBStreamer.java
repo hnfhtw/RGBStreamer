@@ -26,8 +26,8 @@ import java.util.Set;
 import java.util.UUID;
 
 // RGBStreamer Main Activity
-// Version: V01
-// Last Mofidied: 04.02.2016
+// Version: V01_001
+// Last Mofidied: 17.02.2016
 // Author: HN (Bluetooth code: http://developer.android.com/guide/topics/connectivity/bluetooth.html)
 
 public class RGBStreamer extends AppCompatActivity{
@@ -328,9 +328,9 @@ public class RGBStreamer extends AppCompatActivity{
 
             // Step 4: Connect to target device
             mConnectThread = new ConnectThread(connectDevice);
-            while(mSocket==null){}
+            //while(mSocket==null){}
             mConnectThread.run();    // The ConnectThread creates a BluetoothSocket for a secure RFCOMM conection to the remote device and establishes the  connection
-            Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();   // Show a toast if connection was successful
+            Toast.makeText(this, "Connected", Toast.LENGTH_LONG).show();   // Show a toast if connection was successful
             appState.setConnectThread(mConnectThread);
 
             // DEBUG:
