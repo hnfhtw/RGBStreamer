@@ -282,6 +282,26 @@
                     android:text="@string/ackEnabledDrawingString"
                     android:id="@+id/ackEnabledDrawingText"
                     android:layout_weight="0.2" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/uCFPGAswitch" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/useFPGAString"
+                    android:id="@+id/useFPGAText"
+                    android:layout_weight="0.2" />
+
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

@@ -1,0 +1,6 @@
+18.04.2016 - Version V01_002:
+CanvasView.java:    Bug fixed to stream images bigger than 32x32 Pixels
+                    Selection of uC or FPGA as LED panel driver
+RGBStreamer.java:   Selection of uC or FPGA as LED panel driver
+Globals.java:       Selection of uC or FPGA as LED panel driver
+                    Consideration of selected color depth at streaming	

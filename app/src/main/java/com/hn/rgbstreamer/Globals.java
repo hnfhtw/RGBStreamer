@@ -4,10 +4,11 @@ import android.app.Application;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import com.hn.rgbstreamer.RGBStreamer.*;
+import java.math.*;
 
 // RGBStreamer - Global variables to share data across activities
-// Version: V01
-// Last Mofidied: 04.02.2016
+// Version: V01_002
+// Last Mofidied: 18.04.2016
 // Author: HN (Bluetooth code: http://developer.android.com/guide/topics/connectivity/bluetooth.html)
 
 
@@ -30,6 +31,7 @@ public class Globals extends Application {
     private boolean ackEnabledStreaming;
     private int rgbDrawingProtocolSize;
     private boolean ackEnabledDrawing;
+    private boolean useFPGA;
 
     public ConnectedThread getConnectedThread(){
         return mConnectedThread;
@@ -108,6 +110,16 @@ public class Globals extends Application {
         rgbStreamingProtocolSize = protocolsize;
     }
 
+    public void setLEDPanelDriver(boolean FPGA)
+    {
+        useFPGA = FPGA;
+    }
+
+    public boolean getLEDPanelDriver()
+    {
+        return useFPGA;
+    }
+
     public boolean getAckEnabledStreaming(){
         return ackEnabledStreaming;
     }
@@ -146,9 +158,18 @@ public class Globals extends Application {
         byte[] outputByteArray = new byte[rgbStreamingProtocolSize];
         outputByteArray[0] = (byte) (x & 0xFF);
         outputByteArray[1] = (byte) (y & 0xFF);
-        outputByteArray[2] = (byte) (R & 0xFF);
-        outputByteArray[3] = (byte) (G & 0xFF);
-        outputByteArray[4] = (byte) (B & 0xFF);
+
+        if(useFPGA) {   // Consider desired color depth if FPGA is used as panel driver
+            outputByteArray[2] = (byte) ((R*((int)Math.pow(2,colorDepth)-1))/255 & 0xFF);
+            outputByteArray[3] = (byte) ((G*((int)Math.pow(2,colorDepth)-1))/255 & 0xFF);
+            outputByteArray[4] = (byte) ((B*((int)Math.pow(2,colorDepth)-1))/255 & 0xFF);
+        }
+        else {
+            outputByteArray[2] = (byte) (R & 0xFF);
+            outputByteArray[3] = (byte) (G & 0xFF);
+            outputByteArray[4] = (byte) (B & 0xFF);
+        }
+
         if(rgbStreamingProtocolSize == 6)
             outputByteArray[5] = (byte) (outputByteArray[0] ^ outputByteArray[1] ^ outputByteArray[2] ^ outputByteArray[3] ^ outputByteArray[4]);
 
@@ -160,9 +181,18 @@ public class Globals extends Application {
         byte[] outputByteArray = new byte[rgbDrawingProtocolSize];
         outputByteArray[0] = (byte) (x & 0xFF);
         outputByteArray[1] = (byte) (y & 0xFF);
-        outputByteArray[2] = (byte) (R & 0xFF);
-        outputByteArray[3] = (byte) (G & 0xFF);
-        outputByteArray[4] = (byte) (B & 0xFF);
+
+        if(useFPGA) {   // Consider desired color depth if FPGA is used as panel driver
+            outputByteArray[2] = (byte) ((R*((int)Math.pow(2,colorDepth)-1))/255 & 0xFF);
+            outputByteArray[3] = (byte) ((G*((int)Math.pow(2,colorDepth)-1))/255 & 0xFF);
+            outputByteArray[4] = (byte) ((B*((int)Math.pow(2,colorDepth)-1))/255 & 0xFF);
+        }
+        else {
+            outputByteArray[2] = (byte) (R & 0xFF);
+            outputByteArray[3] = (byte) (G & 0xFF);
+            outputByteArray[4] = (byte) (B & 0xFF);
+        }
+
         if(rgbDrawingProtocolSize == 6)
             outputByteArray[5] = (byte) (outputByteArray[0] ^ outputByteArray[1] ^ outputByteArray[2] ^ outputByteArray[3] ^ outputByteArray[4]);
 

@@ -23,6 +23,7 @@
     <string name="rgbDrawingProtocolSizeDefault">6</string>
     <string name="ackEnabledStreamingString">ACK enabled</string>
     <string name="ackEnabledDrawingString">ACK enabled</string>
+    <string name="useFPGAString">Use FPGA as LED Panel Driver</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_draw_picture">DrawPicture</string>
 

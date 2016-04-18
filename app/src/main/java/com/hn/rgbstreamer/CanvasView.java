@@ -20,8 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 // RGBStreamer - CanvasView - draws the panel and sends pixels utilizing the BluetoothSocket
-// Version: V01_001
-// Last Mofidied: 17.02.2016
+// Version: V01_002
+// Last Mofidied: 18.04.2016
 // Author: HN
 
 public class CanvasView extends View {
@@ -212,14 +212,16 @@ public class CanvasView extends View {
     {
         // start streaming with "start streaming" command
         Globals appState = ((Globals)super.getContext().getApplicationContext());
-        appState.sendRGBStreamingPacket(253,253,0,0,0);
 
+        if(!appState.getLEDPanelDriver()) { // use start and stop streaming commands only if the uC is selected to drive the LED panel
+            appState.sendRGBStreamingPacket(253, 253, 0, 0, 0);
+        }
         int ack = 0;
         int r,g,b;
 
         // streaming of bitmap
-        for(int x = 0; x < 32; x++)     // loop through all pixels of bitmap
-            for(int y = 0; y < 32; y++)
+        for(int x = 0; x < pixels_width; x++)     // loop through all pixels of bitmap
+            for(int y = 0; y < pixels_height; y++)
             {
                 r = Color.red(bitmapS.getPixel(x, y));          // get R value of pixel
                 g = Color.green(bitmapS.getPixel(x, y));        // get G value of pixel
@@ -255,10 +257,11 @@ public class CanvasView extends View {
                 colorArray[x][y] = bitmapS.getPixel(x,y);
             }
 
-        // finish streaming with "stop streaming" command
-        appState.sendRGBStreamingPacket(252,252,0,0,0);
-        appState.sendRGBStreamingPacket(0,0,0,0,0);                      // HN Test - to avoid 252 remaining in the fifo buffer
-
+        if(!appState.getLEDPanelDriver()) { // use start and stop streaming commands only if the uC is selected to drive the LED panel
+            // finish streaming with "stop streaming" command
+            appState.sendRGBStreamingPacket(252, 252, 0, 0, 0);
+            appState.sendRGBStreamingPacket(0, 0, 0, 0, 0);                      // HN Test - to avoid 252 remaining in the fifo buffer
+        }
         invalidate();   // update canvas
     }
 

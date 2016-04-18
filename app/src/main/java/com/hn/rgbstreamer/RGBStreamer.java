@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -26,8 +27,8 @@ import java.util.Set;
 import java.util.UUID;
 
 // RGBStreamer Main Activity
-// Version: V01_001
-// Last Mofidied: 17.02.2016
+// Version: V01_002
+// Last Mofidied: 18.04.2016
 // Author: HN (Bluetooth code: http://developer.android.com/guide/topics/connectivity/bluetooth.html)
 
 public class RGBStreamer extends AppCompatActivity{
@@ -45,6 +46,7 @@ public class RGBStreamer extends AppCompatActivity{
     CheckBox ackEnabledDrawingCheckBox;
     Button connectButton;
     Button drawButton;
+    CheckBox uCFPGAswitch;
 
     BluetoothAdapter mBluetoothAdapter;
     Set<BluetoothDevice> pairedDevices;
@@ -64,6 +66,7 @@ public class RGBStreamer extends AppCompatActivity{
     String btReceiverName;
     boolean ackEnabledStreaming;
     boolean ackEnabledDrawing;
+    boolean useFPGA;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +86,7 @@ public class RGBStreamer extends AppCompatActivity{
         ackEnabledDrawingCheckBox = (CheckBox) findViewById(R.id.ackEnabledDrawingCheckBox);
         connectButton = (Button) findViewById(R.id.connectButton);
         drawButton = (Button) findViewById(R.id.drawButton);
+        uCFPGAswitch = (CheckBox) findViewById(R.id.uCFPGAswitch);
 
         // Get saved configuration data using SharedPreferences
         SharedPreferences sharedPref = getSharedPreferences("RGBStreamerConfig", Context.MODE_PRIVATE);      // private mode -> only this app can access the file that will be created
@@ -96,6 +100,7 @@ public class RGBStreamer extends AppCompatActivity{
         btReceiverName = sharedPref.getString("btReceiverName", "RN42-5489"); // if the key doesn't exist -> take the default value "RN42-5489"
         ackEnabledStreaming = sharedPref.getBoolean("ackEnabledStreaming", false); // if the key doesn't exist -> take the default value false
         ackEnabledDrawing = sharedPref.getBoolean("ackEnabledDrawing", false); // if the key doesn't exist -> take the default value false
+        useFPGA = sharedPref.getBoolean("useFPGA", true); // if the key doesn't exist -> take the default value true
 
         // Set the UI elements according to the saved configuration
         noPanelRowsInput.setText(Integer.toString(noPanelRows));
@@ -252,6 +257,14 @@ public class RGBStreamer extends AppCompatActivity{
                                                                    }
                                                                }
         );
+
+        uCFPGAswitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                                                 @Override
+                                                                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                                     useFPGA = isChecked;
+                                                                 }
+                                                             }
+        );
     }
 
     @Override
@@ -287,6 +300,7 @@ public class RGBStreamer extends AppCompatActivity{
         editor.putBoolean("ackEnabledStreaming", ackEnabledStreamingCheckBox.isChecked());
         editor.putInt("rgbDrawingProtocolSize", rgbDrawingProtocolSize);
         editor.putBoolean("ackEnabledDrawing", ackEnabledDrawingCheckBox.isChecked());
+        editor.putBoolean("useFPGA", uCFPGAswitch.isChecked());
         editor.apply();
     }
 
@@ -387,6 +401,7 @@ public class RGBStreamer extends AppCompatActivity{
         appState.setAckEnabledStreaming(ackEnabledStreaming);
         appState.setRGBDrawingProtocolSize(rgbDrawingProtocolSize);
         appState.setAckEnabledDrawing(ackEnabledDrawing);
+        appState.setLEDPanelDriver(useFPGA);
 
         if(mChannel == null)
             Toast.makeText(this, "Please connect to target device first.", Toast.LENGTH_LONG).show();
@@ -395,7 +410,6 @@ public class RGBStreamer extends AppCompatActivity{
             startActivity(intent);
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
