@@ -83,5 +83,44 @@
             android:layout_height="wrap_content"
             android:id="@+id/outputColor" />
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/whiteButton"
+                android:onClick="whiteButtonClicked"
+                android:background="#ffffff"
+                android:layout_weight="1" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/redButton"
+                android:onClick="redButtonClicked"
+                android:background="#ff0000"
+                android:layout_weight="1" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/greenButton"
+                android:onClick="greenButtonClicked"
+                android:background="#00ff00"
+                android:layout_weight="1" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/blueButton"
+                android:onClick="blueButtonClicked"
+                android:background="#0000ff"
+                android:nestedScrollingEnabled="false"
+                android:layout_weight="1" />
         </LinearLayout>
+
+    </LinearLayout>
 </LinearLayout>

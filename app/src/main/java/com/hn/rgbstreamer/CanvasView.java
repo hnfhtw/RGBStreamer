@@ -20,8 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 // RGBStreamer - CanvasView - draws the panel and sends pixels utilizing the BluetoothSocket
-// Version: V01_002
-// Last Mofidied: 18.04.2016
+// Version: V01_003
+// Last Mofidied: 29.04.2016
 // Author: HN
 
 public class CanvasView extends View {
@@ -117,7 +117,7 @@ public class CanvasView extends View {
 
         int pixelWidth = SCALEFACTOR;
         int pixelHeight = SCALEFACTOR;
-        int borderWidth = 2;
+        int borderWidth = 1;
         int rectWidth = SCALEFACTOR - 2*borderWidth;
         int rectHeight = SCALEFACTOR - 2*borderWidth;
 
@@ -142,6 +142,17 @@ public class CanvasView extends View {
         // Send "clear panel" command to panel
         Globals appState = ((Globals)super.getContext().getApplicationContext());
         appState.sendRGBDrawingPacket(254,254,0,0,0);
+    }
+
+    public void fillPanel(int fillColor) {
+        for(int i = 0; i < pixels_width; i++)
+            for(int j = 0; j < pixels_height; j++)
+                colorArray[i][j] = fillColor;
+        invalidate();
+
+        // Send "fill panel" command to panel
+        Globals appState = ((Globals)super.getContext().getApplicationContext());
+        appState.sendRGBDrawingPacket(254,254,Color.red(fillColor),Color.green(fillColor),Color.blue(fillColor));
     }
 
     @Override

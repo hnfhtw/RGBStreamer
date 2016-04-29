@@ -25,8 +25,8 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.hn.rgbstreamer.TextinputDialogFragment.TextinputDialogListener;
 
 // RGBStreamer - DrawPicture activity
-// Version: V01_001
-// Last Mofidied: 17.02.2016
+// Version: V01_003
+// Last Mofidied: 29.04.2016
 // Author: HN            (ColorPicker: https://github.com/QuadFlask/colorpicker,
 //                        TextInputDialog: http://www.androidinterview.com/android-custom-dialog-box-example-android-dialog/
 //                        PickImageFromGallery: http://programmerguru.com/android-tutorial/how-to-pick-image-from-gallery/)
@@ -204,6 +204,28 @@ public class DrawPicture extends AppCompatActivity implements TextinputDialogLis
         else
             Toast.makeText(this, "File not saved!", Toast.LENGTH_SHORT).show();
     }
+
+    public void whiteButtonClicked(View v)
+    {
+        customCanvas.fillPanel(Color.rgb(0xff, 0xff, 0xff));
+    }
+
+    public void redButtonClicked(View v)
+    {
+        customCanvas.fillPanel(Color.rgb(0xff, 0x00, 0x00));
+    }
+
+    public void blueButtonClicked(View v)
+    {
+        customCanvas.fillPanel(Color.rgb(0x00, 0x00, 0xff));
+    }
+
+    public void greenButtonClicked(View v)
+    {
+        customCanvas.fillPanel(Color.rgb(0x00, 0xff, 0x00));
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

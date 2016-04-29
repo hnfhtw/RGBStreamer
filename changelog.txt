@@ -4,3 +4,7 @@ CanvasView.java:    Bug fixed to stream images bigger than 32x32 Pixels
 RGBStreamer.java:   Selection of uC or FPGA as LED panel driver
 Globals.java:       Selection of uC or FPGA as LED panel driver
                     Consideration of selected color depth at streaming	
+
+29.04.2016 - Version V01_003:
+CanvasView.java:    Methods added to fill whole panel with fixed colors (white, red, green, blue)
+DrawPicture.java:   Buttons + onClick methods added to fill whole panel with fixed colors
