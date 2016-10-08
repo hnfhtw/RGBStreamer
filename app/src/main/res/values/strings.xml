@@ -3,7 +3,8 @@
     <string name="titleString">FHTW LED Matrix\nRGB Streamer</string>
     <string name="connectString">Connect</string>
     <string name="streamString">Stream Picture</string>
-    <string name="drawString">Draw / Stream</string>
+    <string name="drawString">Draw</string>
+    <string name="snakeString">Snake</string>
     <string name="configstring">Configuration</string>
     <string name="noPanelRowsString">Number of panel rows</string>
     <string name="noPanelRowsDefault">1</string>
@@ -26,7 +27,7 @@
     <string name="useFPGAString">Use FPGA as LED Panel Driver</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_draw_picture">DrawPicture</string>
-
+    <string name="playButtonString">Play</string>
     <string name="drawPicture_backButtonString">Back</string>
 
     <string name="hello_world">Hello world!</string>

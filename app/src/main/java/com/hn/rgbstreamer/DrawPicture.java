@@ -14,8 +14,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.Handler;      // HN SNAKE
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
@@ -23,16 +25,20 @@ import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import com.hn.rgbstreamer.TextinputDialogFragment.TextinputDialogListener;
+import com.hn.rgbstreamer.CanvasView.SnakeDirections;
+import com.hn.rgbstreamer.CanvasView.GameStatusListener;
+
+import org.w3c.dom.Text;
 
 // RGBStreamer - DrawPicture activity
-// Version: V01_003
-// Last Mofidied: 29.04.2016
+// Version: V01_004
+// Last Mofidied: 08.10.2016 (snake game functionality added)
 // Author: HN            (ColorPicker: https://github.com/QuadFlask/colorpicker,
 //                        TextInputDialog: http://www.androidinterview.com/android-custom-dialog-box-example-android-dialog/
 //                        PickImageFromGallery: http://programmerguru.com/android-tutorial/how-to-pick-image-from-gallery/)
 
 
-public class DrawPicture extends AppCompatActivity implements TextinputDialogListener{
+public class DrawPicture extends AppCompatActivity implements TextinputDialogListener, GameStatusListener{
 
     private static final int RESULT_LOAD_IMG = 1;
     private CanvasView customCanvas;
@@ -42,17 +48,36 @@ public class DrawPicture extends AppCompatActivity implements TextinputDialogLis
     String imgDecodableString;
     private int px_width;
     private int px_height;
+    private boolean isSnakeMode;
+    private Handler snakeHandler;
+    private boolean playSnake;
+    Button playButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_draw_picture);
+
+        Globals appState = ((Globals)getApplicationContext());
+        this.isSnakeMode = appState.getSnakeMode();
+
+        if(isSnakeMode) {
+            setContentView(R.layout.activity_snake);
+            snakeHandler = new Handler();
+            playButton = (Button) findViewById(R.id.playButton1);
+            setTitle("Snake");
+        }
+        else {
+            setContentView(R.layout.activity_draw_picture);
+            outputText = (TextView) findViewById(R.id.outputText);
+            outputColor = (TextView) findViewById(R.id.outputColor);
+        }
 
         // Get a reference to all UI widgets
-        outputText = (TextView) findViewById(R.id.outputText);
-        outputColor = (TextView) findViewById(R.id.outputColor);
         customCanvas = (CanvasView) findViewById(R.id.signature_canvas);
-        customCanvas.setOutput(outputText);
+        customCanvas.setGameStatusListener(this);
+
+        if(!isSnakeMode)
+            customCanvas.setOutput(outputText);
     }
 
     @Override
@@ -66,10 +91,11 @@ public class DrawPicture extends AppCompatActivity implements TextinputDialogLis
             else
                 this.initialColor = Color.WHITE;
 
-            //DEBUG Text:
-            String hexColor = String.format("#%06X", (0xFFFFFF & initialColor));   // convert the int color to a hex format (for debugging)
-            outputColor.setText("HEX Color: "+hexColor);  // output of the picked color (for debugging)
-
+            if(!isSnakeMode) {
+                //DEBUG Text:
+                String hexColor = String.format("#%06X", (0xFFFFFF & initialColor));   // convert the int color to a hex format (for debugging)
+                outputColor.setText("HEX Color: " + hexColor);  // output of the picked color (for debugging)
+            }
             customCanvas.setColor(initialColor); // set the initial color in the canvas
 
             // get width and height of the drawing area available on the panels (number of pixels)
@@ -80,7 +106,10 @@ public class DrawPicture extends AppCompatActivity implements TextinputDialogLis
 
     public void backButtonClicked(View view)
     {
-       super.finish();
+        Globals appState = ((Globals)getApplicationContext());
+        appState.setSnakeMode(false);
+        isSnakeMode = false;
+        super.finish();
     }
 
     public void streamBitmapButtonClicked(View view)
@@ -158,13 +187,14 @@ public class DrawPicture extends AppCompatActivity implements TextinputDialogLis
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
 
-                        //DEBUG Text:
-                        String hexColor = String.format("#%06X", (0xFFFFFF & selectedColor));   // convert the int color to a hex format (for debugging)
-                        outputColor.setText(hexColor);  // output of the picked color (for debugging)
-
+                        if (!isSnakeMode) {
+                            //DEBUG Text:
+                            String hexColor = String.format("#%06X", (0xFFFFFF & selectedColor));   // convert the int color to a hex format (for debugging)
+                            outputColor.setText(hexColor);  // output of the picked color (for debugging)
+                        }
                         customCanvas.setColor(selectedColor); // set the new color in the canvas
 
-                        Globals appState = ((Globals)getApplicationContext());
+                        Globals appState = ((Globals) getApplicationContext());
                         appState.setColor(selectedColor);
                     }
                 })
@@ -225,6 +255,63 @@ public class DrawPicture extends AppCompatActivity implements TextinputDialogLis
         customCanvas.fillPanel(Color.rgb(0x00, 0xff, 0x00));
     }
 
+    public void upButtonClicked(View v)
+    {
+        if(playSnake)
+            customCanvas.setSnakeDirection(SnakeDirections.UP);
+    }
+
+    public void downButtonClicked(View v)
+    {
+        if(playSnake)
+            customCanvas.setSnakeDirection(SnakeDirections.DOWN);
+    }
+
+    public void leftButtonClicked(View v)
+    {
+        if(playSnake)
+            customCanvas.setSnakeDirection(SnakeDirections.LEFT);
+    }
+
+    public void rightButtonClicked(View v)
+    {
+        if(playSnake)
+            customCanvas.setSnakeDirection(SnakeDirections.RIGHT);
+    }
+
+    public void playButtonClicked(View v)
+    {
+        if(!playSnake) {
+            snakeHandler.post(snakeRunnable);
+            playSnake = true;
+            playButton.setText("Pause");
+        }
+        else {
+            snakeHandler.removeCallbacks(snakeRunnable);
+            playSnake = false;
+            playButton.setText("Play");
+        }
+    }
+
+    private Runnable snakeRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(playSnake) {
+                customCanvas.snakeUpdate();
+                snakeHandler.postDelayed(snakeRunnable, 100);
+            }
+        }
+    };
+
+    public void gameStatusChanged(boolean gameover, int snakeLength){
+        if(gameover) {
+            playSnake = false;
+            customCanvas.snakeReset();
+            snakeHandler.removeCallbacks(snakeRunnable);
+            Toast.makeText(this, "Game Over - Score: " + snakeLength, Toast.LENGTH_LONG).show();
+            playButton.setText("Play");
+        }
+    }
 
 
     @Override

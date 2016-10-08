@@ -8,3 +8,6 @@ Globals.java:       Selection of uC or FPGA as LED panel driver
 29.04.2016 - Version V01_003:
 CanvasView.java:    Methods added to fill whole panel with fixed colors (white, red, green, blue)
 DrawPicture.java:   Buttons + onClick methods added to fill whole panel with fixed colors
+
+08.10.2016 - Version V01_004:
+Snake Game Functionality added (no own activity - functionality added to DrawPicture activity and CanvasView)

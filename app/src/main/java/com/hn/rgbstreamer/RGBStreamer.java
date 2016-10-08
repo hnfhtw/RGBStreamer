@@ -46,6 +46,7 @@ public class RGBStreamer extends AppCompatActivity{
     CheckBox ackEnabledDrawingCheckBox;
     Button connectButton;
     Button drawButton;
+    Button snakeButton;
     CheckBox uCFPGAswitch;
 
     BluetoothAdapter mBluetoothAdapter;
@@ -86,6 +87,7 @@ public class RGBStreamer extends AppCompatActivity{
         ackEnabledDrawingCheckBox = (CheckBox) findViewById(R.id.ackEnabledDrawingCheckBox);
         connectButton = (Button) findViewById(R.id.connectButton);
         drawButton = (Button) findViewById(R.id.drawButton);
+        snakeButton = (Button) findViewById(R.id.snakeButton);
         uCFPGAswitch = (CheckBox) findViewById(R.id.uCFPGAswitch);
 
         // Get saved configuration data using SharedPreferences
@@ -409,6 +411,13 @@ public class RGBStreamer extends AppCompatActivity{
             Intent intent = new Intent(this, DrawPicture.class);
             startActivity(intent);
         }
+    }
+
+    public void snakeButtonClicked(View view) {
+        Globals appState = ((Globals) getApplicationContext());
+        appState.setSnakeMode(true);
+
+        drawButtonClicked(view);
     }
 
     @Override

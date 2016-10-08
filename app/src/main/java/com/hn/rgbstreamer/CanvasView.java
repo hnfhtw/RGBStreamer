@@ -14,14 +14,19 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
+
+import com.hn.rgbstreamer.DrawPicture.*;
 
 // RGBStreamer - CanvasView - draws the panel and sends pixels utilizing the BluetoothSocket
-// Version: V01_003
-// Last Mofidied: 29.04.2016
+// Version: V01_004
+// Last Mofidied: 08.10.2016 (snake game functionality added)
 // Author: HN
 
 public class CanvasView extends View {
@@ -37,11 +42,33 @@ public class CanvasView extends View {
     private int yout = 0;
     private int color = Color.WHITE;
     private int SCALEFACTOR = 30;  // HN original 20 (for 640x640px), 30 (for 960x960px)
-    private int[][] colorArray;
+    private int[][][] colorArray;
 
     private int colorDepth;
     private int pixels_width;
     private int pixels_height;
+
+    private boolean isSnakeMode;
+    public enum SnakeDirections {
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
+    }
+    private SnakeDirections snakeDirection = SnakeDirections.RIGHT;
+    private SnakeDirections snakeDirectionOLD = SnakeDirections.UP;
+    private int snakeStartLenght = 5;
+    private int snakeLenght = snakeStartLenght;
+    private int snakePosition = snakeStartLenght;
+    private int snakeHeadX = 10;
+    private int snakeHeadY = 10;
+    private int coinX = 20;
+    private int coinY = 20;
+    ArrayList<GameStatusListener> listeners = new ArrayList<GameStatusListener>();
+
+    public interface GameStatusListener {
+        void gameStatusChanged(boolean gameover, int snakeLenght);
+    }
 
     public CanvasView(Context c, AttributeSet attrs) {  // constructor
         super(c, attrs);
@@ -58,11 +85,35 @@ public class CanvasView extends View {
         Globals appState = ((Globals)super.getContext().getApplicationContext());
         pixels_width = appState.getNoPanelCol()*appState.getNoPixelCol();
         pixels_height = appState.getNoPanelRows()*appState.getNoPixelRows();
+        isSnakeMode = appState.getSnakeMode();
 
-        colorArray = new int[pixels_width][pixels_height];
-        for(int i = 0; i < pixels_width; i++)
-            for(int j = 0; j < pixels_height; j++)
-                colorArray[i][j] = Color.rgb(100,100,100);
+        colorArray = new int[pixels_width][pixels_height][2];
+        for(int i = 0; i < pixels_width; i++) {
+            for (int j = 0; j < pixels_height; j++) {
+                colorArray[i][j][0] = Color.rgb(100, 100, 100);       // index 0 = color value
+                if(isSnakeMode)
+                    colorArray[i][j][1] = 0;                            // index 1 = snake position count
+            }
+        }
+
+        if(isSnakeMode) {
+            for(int i = 0; i < snakeStartLenght; i++) {
+                colorArray[snakeHeadX-i][snakeHeadY][0] = color;
+                colorArray[snakeHeadX-i][snakeHeadY][1] = (snakeStartLenght-i);
+                appState.sendRGBDrawingPacket(snakeHeadX-i, snakeHeadY, Color.red(color), Color.green(color), Color.blue(color));
+            }
+
+            while(true) {
+                Random rand = new Random();
+                coinX = rand.nextInt(pixels_width);
+                coinY = rand.nextInt(pixels_height);
+                if(colorArray[coinX][coinY][0] == Color.rgb(100,100,100)) {
+                    colorArray[coinX][coinY][0] = Color.YELLOW;
+                    appState.sendRGBDrawingPacket(coinX, coinY, Color.red(0xFF), Color.green(0xFF), Color.blue(0x00));
+                    break;
+                }
+            }
+        }
     }
 
     // Measure the available size on the screen and set the size of the CanvasView to an integer multiple of the available pixels
@@ -91,8 +142,141 @@ public class CanvasView extends View {
     {
         color = selectedColor;
 
-        //DEBUG Text:
-        outputText.setText("Coordinates [x / y]: " + xout + " / " + yout + "\nColors: R = " + Color.red(color) + ", G = " + Color.green(color) + ", B = " + Color.blue(color));
+        if(!isSnakeMode) {
+            //DEBUG Text:
+            outputText.setText("Coordinates [x / y]: " + xout + " / " + yout + "\nColors: R = " + Color.red(color) + ", G = " + Color.green(color) + ", B = " + Color.blue(color));
+        }
+    }
+
+    // set snake direction
+    public void setSnakeDirection(SnakeDirections direction)
+    {
+        snakeDirection = direction;
+    }
+
+    public void snakeUpdate()
+    {
+        Globals appState = ((Globals)super.getContext().getApplicationContext());
+
+        snakePosition++;
+
+        switch(snakeDirection) {
+            case UP:
+                if(snakeDirectionOLD != SnakeDirections.DOWN) {
+                    snakeHeadY--;
+                    snakeDirectionOLD = snakeDirection;
+                    break;
+                }
+                else {
+                    snakeHeadY++;
+                    break;
+                }
+
+            case DOWN:
+                if(snakeDirectionOLD != SnakeDirections.UP) {
+                    snakeHeadY++;
+                    snakeDirectionOLD = snakeDirection;
+                    break;
+                }
+                else {
+                    snakeHeadY--;
+                    break;
+                }
+
+            case LEFT:
+                if(snakeDirectionOLD != SnakeDirections.RIGHT) {
+                    snakeHeadX--;
+                    snakeDirectionOLD = snakeDirection;
+                    break;
+                }
+                else {
+                    snakeHeadX++;
+                    break;
+                }
+
+            case RIGHT:
+                if(snakeDirectionOLD != SnakeDirections.LEFT) {
+                    snakeHeadX++;
+                    snakeDirectionOLD = snakeDirection;
+                    break;
+                }
+                else {
+                    snakeHeadX--;
+                    break;
+                }
+        }
+
+        if(snakeHeadX == coinX && snakeHeadY == coinY) {
+            snakeLenght++;
+
+            while(true) {
+                Random rand = new Random();
+                coinX = rand.nextInt(pixels_width);
+                coinY = rand.nextInt(pixels_height);
+                if(colorArray[coinX][coinY][0] == Color.rgb(100,100,100)) {
+                    colorArray[coinX][coinY][0] = Color.YELLOW;
+                    appState.sendRGBDrawingPacket(coinX, coinY, Color.red(0xFF), Color.green(0xFF), Color.blue(0x00));
+                    break;
+                }
+            }
+        }
+        else if(snakeHeadX < 0 || snakeHeadX > (pixels_width-1) || snakeHeadY < 0 || snakeHeadY > (pixels_height-1) || colorArray[snakeHeadX][snakeHeadY][0] != Color.rgb(100,100,100)) {
+            for (GameStatusListener listener:listeners){
+                listener.gameStatusChanged(true, snakeLenght);
+            }
+        }
+
+        colorArray[snakeHeadX][snakeHeadY][0] = color;
+        colorArray[snakeHeadX][snakeHeadY][1] = snakePosition;
+        appState.sendRGBDrawingPacket(snakeHeadX, snakeHeadY, Color.red(color), Color.green(color), Color.blue(color));
+
+        for(int i = 0; i < pixels_width; i++) {
+            for (int j = 0; j < pixels_height; j++) {
+                if (colorArray[i][j][1] == snakePosition - snakeLenght) {
+                    colorArray[i][j][0] = Color.rgb(100, 100, 100);
+                    colorArray[i][j][1] = 0;
+                    appState.sendRGBDrawingPacket(i, j, Color.red(0), Color.green(0), Color.blue(0));
+                    break;
+                }
+            }
+        }
+        invalidate();
+    }
+
+    public void snakeReset()
+    {
+        Globals appState = ((Globals)super.getContext().getApplicationContext());
+
+        snakeDirection = SnakeDirections.RIGHT;
+        snakeDirectionOLD = SnakeDirections.UP;
+        snakeLenght = snakeStartLenght;
+        snakePosition = snakeStartLenght;
+        snakeHeadX = 10;
+        snakeHeadY = 10;
+        clearCanvas();
+
+        for(int i = 0; i < snakeStartLenght; i++) {
+            colorArray[snakeHeadX-i][snakeHeadY][0] = color;
+            colorArray[snakeHeadX-i][snakeHeadY][1] = (snakeStartLenght-i);
+            appState.sendRGBDrawingPacket(snakeHeadX-i, snakeHeadY, Color.red(color), Color.green(color), Color.blue(color));
+        }
+
+        while(true) {
+            Random rand = new Random();
+            coinX = rand.nextInt(pixels_width);
+            coinY = rand.nextInt(pixels_height);
+            if(colorArray[coinX][coinY][0] == Color.rgb(100,100,100)) {
+                colorArray[coinX][coinY][0] = Color.YELLOW;
+                appState.sendRGBDrawingPacket(coinX, coinY, Color.red(0xFF), Color.green(0xFF), Color.blue(0x00));
+                break;
+            }
+        }
+
+        invalidate();
+    }
+
+    public void setGameStatusListener(GameStatusListener listener){
+        listeners.add(listener);
     }
 
     @Override
@@ -123,20 +307,26 @@ public class CanvasView extends View {
 
         for(int i = 0; i < width / SCALEFACTOR; i++) {
             for (int j = 0; j < height / SCALEFACTOR; j++) {
-                mPaint.setColor(colorArray[i][j]);
+                mPaint.setColor(colorArray[i][j][0]);
                 canvas.drawRect(borderWidth + i * pixelWidth, borderWidth + j * pixelHeight, borderWidth + rectWidth + i * pixelWidth, borderWidth + rectHeight + j * pixelHeight, mPaint);
             }
         }
 
-        //DEBUG Text:
-        outputText.setText("Coordinates [x / y]: " + xout + " / " + yout + "\nColors: R = " + Color.red(color) + ", G = " + Color.green(color) + ", B = " + Color.blue(color));
+        if(!isSnakeMode) {
+            //DEBUG Text:
+            outputText.setText("Coordinates [x / y]: " + xout + " / " + yout + "\nColors: R = " + Color.red(color) + ", G = " + Color.green(color) + ", B = " + Color.blue(color));
+        }
     }
 
     // clear the picture - draw the initial grey grid again by filling the colorArray with initial grid color 100,100,100
     public void clearCanvas() {
         for(int i = 0; i < pixels_width; i++)
-            for(int j = 0; j < pixels_height; j++)
-                colorArray[i][j] = Color.rgb(100,100,100);
+            for(int j = 0; j < pixels_height; j++) {
+                colorArray[i][j][0] = Color.rgb(100,100,100);
+                if(isSnakeMode)
+                    colorArray[i][j][1] = 0;
+            }
+
         invalidate();
 
         // Send "clear panel" command to panel
@@ -147,7 +337,7 @@ public class CanvasView extends View {
     public void fillPanel(int fillColor) {
         for(int i = 0; i < pixels_width; i++)
             for(int j = 0; j < pixels_height; j++)
-                colorArray[i][j] = fillColor;
+                colorArray[i][j][0] = fillColor;
         invalidate();
 
         // Send "fill panel" command to panel
@@ -178,7 +368,7 @@ public class CanvasView extends View {
         else if(y > height)
             yout = height / SCALEFACTOR - 1; // - 1 to avoid yout from getting 32 -> crash otherwise (colorArray overflow -> index is from 0 to 31)
 
-        colorArray[xout][yout] = color;
+        colorArray[xout][yout][0] = color;
 
         invalidate();   // calls onDraw to redraw the canvas
 
@@ -265,7 +455,7 @@ public class CanvasView extends View {
                 }
 
                 // update color array to show picture on canvas
-                colorArray[x][y] = bitmapS.getPixel(x,y);
+                colorArray[x][y][0] = bitmapS.getPixel(x,y);
             }
 
         if(!appState.getLEDPanelDriver()) { // use start and stop streaming commands only if the uC is selected to drive the LED panel
@@ -301,7 +491,7 @@ public class CanvasView extends View {
                 for(int y = 0; y < 32; y++)
                 {
                     //if(colorArray[x][y] !=0xFF646464)   // could be used to filter out the color of grey grid
-                        sBitmap.setPixel(x,y,colorArray[x][y]);
+                        sBitmap.setPixel(x,y,colorArray[x][y][0]);
                    // else
                      //   sBitmap.setPixel(x,y,0xFF000000);   // could be used to replace grey grid color by black
                 }
@@ -351,7 +541,7 @@ public class CanvasView extends View {
 
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
-            this.colorArray = (int[][]) bundle.getSerializable("colorArray");
+            this.colorArray = (int[][][]) bundle.getSerializable("colorArray");
             state = bundle.getParcelable("instanceState");
         }
         super.onRestoreInstanceState(state);

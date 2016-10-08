@@ -32,6 +32,7 @@ public class Globals extends Application {
     private int rgbDrawingProtocolSize;
     private boolean ackEnabledDrawing;
     private boolean useFPGA;
+    private boolean isSnakeMode;
 
     public ConnectedThread getConnectedThread(){
         return mConnectedThread;
@@ -198,4 +199,15 @@ public class Globals extends Application {
 
         mConnectedThread.write(outputByteArray);
     }
+
+    public void setSnakeMode(boolean enable)
+    {
+        isSnakeMode = enable;
+    }
+
+    public boolean getSnakeMode()
+    {
+        return isSnakeMode;
+    }
+
 }

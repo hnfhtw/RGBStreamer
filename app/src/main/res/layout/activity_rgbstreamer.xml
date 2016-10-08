@@ -63,6 +63,14 @@
                     android:onClick="drawButtonClicked"
                     android:layout_weight="1" />
 
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/snakeString"
+                    android:id="@+id/snakeButton"
+                    android:onClick="snakeButtonClicked"
+                    android:layout_weight="1" />
+
             </LinearLayout>
 
             <TextView android:text="@string/configstring" android:layout_width="match_parent"
