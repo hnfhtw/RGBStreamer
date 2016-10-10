@@ -17,7 +17,7 @@
     <string name="colorDepthString">Color depth per color [bits]</string>
     <string name="colorDepthDefault">8</string>
     <string name="btReceiverNameString">Name of BT receiver module</string>
-    <string name="btReceiverNameDefault">RN42-5489</string>
+    <string name="btReceiverNameDefault">RNBT-940E</string>
     <string name="rgbStreamingProtocolSizeString">Streaming RGB packet size (5 or 6 bytes)</string>
     <string name="rgbDrawingProtocolSizeString">Drawing RGB packet size (5 or 6 bytes)</string>
     <string name="rgbStreamingProtocolSizeDefault">5</string>

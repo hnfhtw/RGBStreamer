@@ -11,3 +11,6 @@ DrawPicture.java:   Buttons + onClick methods added to fill whole panel with fix
 
 08.10.2016 - Version V01_004:
 Snake Game Functionality added (no own activity - functionality added to DrawPicture activity and CanvasView)
+
+10.10.2016 - Version V01_005:
+Snake Game Bugfix (coin was not visible) + default name of bluetooth module changed

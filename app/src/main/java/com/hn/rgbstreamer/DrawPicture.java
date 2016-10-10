@@ -31,8 +31,8 @@ import com.hn.rgbstreamer.CanvasView.GameStatusListener;
 import org.w3c.dom.Text;
 
 // RGBStreamer - DrawPicture activity
-// Version: V01_004
-// Last Mofidied: 08.10.2016 (snake game functionality added)
+// Version: V01_005
+// Last Mofidied: 10.10.2016 (snake game functionality added)
 // Author: HN            (ColorPicker: https://github.com/QuadFlask/colorpicker,
 //                        TextInputDialog: http://www.androidinterview.com/android-custom-dialog-box-example-android-dialog/
 //                        PickImageFromGallery: http://programmerguru.com/android-tutorial/how-to-pick-image-from-gallery/)
@@ -108,6 +108,7 @@ public class DrawPicture extends AppCompatActivity implements TextinputDialogLis
     {
         Globals appState = ((Globals)getApplicationContext());
         appState.setSnakeMode(false);
+        customCanvas.clearCanvas();
         isSnakeMode = false;
         super.finish();
     }
@@ -298,7 +299,7 @@ public class DrawPicture extends AppCompatActivity implements TextinputDialogLis
         public void run() {
             if(playSnake) {
                 customCanvas.snakeUpdate();
-                snakeHandler.postDelayed(snakeRunnable, 100);
+                snakeHandler.postDelayed(snakeRunnable, 70);
             }
         }
     };

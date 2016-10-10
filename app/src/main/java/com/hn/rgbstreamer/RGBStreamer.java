@@ -27,8 +27,8 @@ import java.util.Set;
 import java.util.UUID;
 
 // RGBStreamer Main Activity
-// Version: V01_002
-// Last Mofidied: 18.04.2016
+// Version: V01_005
+// Last Mofidied: 10.10.2016
 // Author: HN (Bluetooth code: http://developer.android.com/guide/topics/connectivity/bluetooth.html)
 
 public class RGBStreamer extends AppCompatActivity{
@@ -99,7 +99,7 @@ public class RGBStreamer extends AppCompatActivity{
         colorDepth = sharedPref.getInt("colorDepth", 8); // if the key doesn't exist -> take the default value 8
         rgbStreamingProtocolSize = sharedPref.getInt("rgbStreamingProtocolSize", 5); // if the key doesn't exist -> take the default value 5
         rgbDrawingProtocolSize = sharedPref.getInt("rgbDrawingProtocolSize", 6); // if the key doesn't exist -> take the default value 6
-        btReceiverName = sharedPref.getString("btReceiverName", "RN42-5489"); // if the key doesn't exist -> take the default value "RN42-5489"
+        btReceiverName = sharedPref.getString("btReceiverName", "RNBT-940E"); // if the key doesn't exist -> take the default value "RN42-5489" (old), "RNBT-940E" (new)
         ackEnabledStreaming = sharedPref.getBoolean("ackEnabledStreaming", false); // if the key doesn't exist -> take the default value false
         ackEnabledDrawing = sharedPref.getBoolean("ackEnabledDrawing", false); // if the key doesn't exist -> take the default value false
         useFPGA = sharedPref.getBoolean("useFPGA", true); // if the key doesn't exist -> take the default value true

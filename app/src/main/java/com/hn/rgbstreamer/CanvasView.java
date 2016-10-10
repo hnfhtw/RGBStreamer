@@ -25,8 +25,8 @@ import java.util.Random;
 import com.hn.rgbstreamer.DrawPicture.*;
 
 // RGBStreamer - CanvasView - draws the panel and sends pixels utilizing the BluetoothSocket
-// Version: V01_004
-// Last Mofidied: 08.10.2016 (snake game functionality added)
+// Version: V01_005
+// Last Mofidied: 10.10.2016 (snake game functionality added)
 // Author: HN
 
 public class CanvasView extends View {
@@ -109,7 +109,7 @@ public class CanvasView extends View {
                 coinY = rand.nextInt(pixels_height);
                 if(colorArray[coinX][coinY][0] == Color.rgb(100,100,100)) {
                     colorArray[coinX][coinY][0] = Color.YELLOW;
-                    appState.sendRGBDrawingPacket(coinX, coinY, Color.red(0xFF), Color.green(0xFF), Color.blue(0x00));
+                    appState.sendRGBDrawingPacket(coinX, coinY, 255, 255, 0);
                     break;
                 }
             }
@@ -215,7 +215,7 @@ public class CanvasView extends View {
                 coinY = rand.nextInt(pixels_height);
                 if(colorArray[coinX][coinY][0] == Color.rgb(100,100,100)) {
                     colorArray[coinX][coinY][0] = Color.YELLOW;
-                    appState.sendRGBDrawingPacket(coinX, coinY, Color.red(0xFF), Color.green(0xFF), Color.blue(0x00));
+                    appState.sendRGBDrawingPacket(coinX, coinY,255, 255, 0);
                     break;
                 }
             }
@@ -235,7 +235,7 @@ public class CanvasView extends View {
                 if (colorArray[i][j][1] == snakePosition - snakeLenght) {
                     colorArray[i][j][0] = Color.rgb(100, 100, 100);
                     colorArray[i][j][1] = 0;
-                    appState.sendRGBDrawingPacket(i, j, Color.red(0), Color.green(0), Color.blue(0));
+                    appState.sendRGBDrawingPacket(i, j,0,0, 0);
                     break;
                 }
             }
@@ -267,7 +267,7 @@ public class CanvasView extends View {
             coinY = rand.nextInt(pixels_height);
             if(colorArray[coinX][coinY][0] == Color.rgb(100,100,100)) {
                 colorArray[coinX][coinY][0] = Color.YELLOW;
-                appState.sendRGBDrawingPacket(coinX, coinY, Color.red(0xFF), Color.green(0xFF), Color.blue(0x00));
+                appState.sendRGBDrawingPacket(coinX, coinY, 255, 255,0);
                 break;
             }
         }
