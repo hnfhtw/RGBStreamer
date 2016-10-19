@@ -14,3 +14,6 @@ Snake Game Functionality added (no own activity - functionality added to DrawPic
 
 10.10.2016 - Version V01_005:
 Snake Game Bugfix (coin was not visible) + default name of bluetooth module changed
+
+19.10.2016 - Version V01_006:
+Bugfix - Permission handling to access external storage was changed in Android 6 -> request permission at runtime added in RGBStreamer.java

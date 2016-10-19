@@ -6,6 +6,10 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -27,8 +31,8 @@ import java.util.Set;
 import java.util.UUID;
 
 // RGBStreamer Main Activity
-// Version: V01_005
-// Last Mofidied: 10.10.2016
+// Version: V01_006
+// Last Mofidied: 19.10.2016
 // Author: HN (Bluetooth code: http://developer.android.com/guide/topics/connectivity/bluetooth.html)
 
 public class RGBStreamer extends AppCompatActivity{
@@ -69,10 +73,16 @@ public class RGBStreamer extends AppCompatActivity{
     boolean ackEnabledDrawing;
     boolean useFPGA;
 
+    private static final int REQUEST_CODE = 0x11;
+    String[] permissions = {"android.permission.WRITE_EXTERNAL_STORAGE"};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rgbstreamer);
+
+        // Request permission to write/read external data (for Android version 6 and later)
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE);
 
         // Get a reference to all UI widgets
         noPanelRowsInput = (EditText) findViewById(R.id.noPanelRows);
@@ -551,6 +561,19 @@ public class RGBStreamer extends AppCompatActivity{
             try {
                 mmSocket.close();
             } catch (IOException e) { }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // permission granted -> do something
+            } else {
+                Toast.makeText(getApplicationContext(), "PERMISSION_DENIED", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
